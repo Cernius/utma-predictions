@@ -6,14 +6,24 @@ import { Leaderboard } from "@/components/Leaderboard";
 import { NameGate } from "@/components/NameGate";
 import { event, fights } from "@/data/event";
 import type { Ballot, Pick } from "@/lib/ballots";
-import { isPickComplete, saveName, savePick, subscribeToBallots } from "@/lib/ballots";
+import {
+  clearLocalBallots,
+  deleteBallot,
+  isPickComplete,
+  saveName,
+  savePick,
+  subscribeToBallots,
+} from "@/lib/ballots";
 import { isFirebaseConfigured } from "@/lib/firebase";
+import { useHashFlag } from "@/lib/hash";
 import { asset } from "@/lib/paths";
 import { useVoter } from "@/lib/voter";
 
 export default function Home() {
-  const { voter, ready, signIn } = useVoter();
+  const { voter, ready, signIn, signOut } = useVoter();
+  const showReset = useHashFlag("reset");
   const [renaming, setRenaming] = useState(false);
+  const [resetting, setResetting] = useState(false);
   const [ballots, setBallots] = useState<Ballot[]>([]);
   /** Picks shown before the write round-trips, so taps feel instant. */
   const [optimistic, setOptimistic] = useState<Record<string, Pick>>({});
@@ -74,6 +84,24 @@ export default function Home() {
     },
     [voter],
   );
+
+  /** Wipes this device: my ballot, the localStorage fallback store and my name. */
+  const handleReset = useCallback(async () => {
+    if (!window.confirm("Ištrinti šio įrenginio spėjimus ir vardą?")) return;
+    setResetting(true);
+    try {
+      if (voter) await deleteBallot(voter.id);
+      clearLocalBallots();
+      setOptimistic({});
+      setError(null);
+      signOut();
+    } catch (cause) {
+      console.error("Failed to reset", cause);
+      setError("Nepavyko išvalyti duomenų. Bandyk dar kartą.");
+    } finally {
+      setResetting(false);
+    }
+  }, [signOut, voter]);
 
   const completed = fights.filter((fight) => isPickComplete(myPicks[fight.id])).length;
   const percent = Math.round((completed / fights.length) * 100);
@@ -239,6 +267,17 @@ export default function Home() {
           </a>
           .
         </p>
+
+        {showReset && (
+          <button
+            type="button"
+            onClick={handleReset}
+            disabled={resetting}
+            className="label mt-4 cursor-pointer rounded-lg border border-danger/40 px-3.5 py-2 text-[9px] text-danger transition hover:bg-danger/10 disabled:cursor-wait disabled:opacity-60"
+          >
+            {resetting ? "Valoma…" : "Išvalyti šio įrenginio duomenis"}
+          </button>
+        )}
       </footer>
     </div>
   );

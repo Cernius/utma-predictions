@@ -167,6 +167,25 @@ export async function savePick(
   });
 }
 
+/** Drops the whole localStorage fallback store, including pre-Firebase leftovers. */
+export function clearLocalBallots(): void {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(LOCAL_KEY);
+  window.dispatchEvent(new Event(LOCAL_EVENT));
+}
+
+export async function deleteBallot(voterId: string): Promise<void> {
+  if (!isFirebaseConfigured) {
+    const all = readLocal();
+    delete all[voterId];
+    writeLocal(all);
+    return;
+  }
+
+  const [db, { ref, remove }] = await Promise.all([getDb(), import("firebase/database")]);
+  await remove(ref(db, `predictions/${event.id}/${voterId}`));
+}
+
 export async function saveName(voter: { id: string; name: string }): Promise<void> {
   if (!isFirebaseConfigured) {
     const all = readLocal();

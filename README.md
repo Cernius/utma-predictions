@@ -72,6 +72,14 @@ publishes `out/`. The workflow passes `NEXT_PUBLIC_BASE_PATH=/<repo>` so assets 
 project-site sub-path; delete that line if you deploy to a `<user>.github.io` repo or a custom
 domain served from the root.
 
+## Resetting a device
+
+Append `#reset` to the URL (e.g. `https://cernius.github.io/utma-predictions/#reset`) to reveal a
+reset button in the footer. After a confirmation it deletes this voter's ballot from the database,
+drops the `localStorage` fallback store — including predictions left over from before Firebase was
+wired up — and forgets the saved name, so the app returns to the name gate. It only ever touches
+your own ballot; other players are unaffected.
+
 ## Updating the fight card
 
 `src/data/event.ts` holds the event metadata and the fights, in card order. Fighter portraits
