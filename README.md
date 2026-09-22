@@ -20,6 +20,10 @@ Without Firebase credentials the app still works end to end — predictions are 
 
 ## Firebase setup
 
+The live project is **`utma-predictions`** ([console](https://console.firebase.google.com/project/utma-predictions/overview)),
+with its Realtime Database at `https://utma-predictions-default-rtdb.firebaseio.com` (us-central1).
+`firebase deploy --only database` publishes `database.rules.json` to it. To recreate it elsewhere:
+
 1. Create a Firebase project and add a **Realtime Database** (not Firestore).
 2. Copy the web app config values into `.env.local` using `.env.example` as the template.
    `NEXT_PUBLIC_FIREBASE_DATABASE_URL` and `NEXT_PUBLIC_FIREBASE_API_KEY` are the two the app
