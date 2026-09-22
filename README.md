@@ -99,7 +99,8 @@ your own ballot; other players are unaffected.
 
 ## Updating the fight card
 
-`src/data/event.ts` holds the event metadata and the fights, in card order (main card, then
-prelims). Fighter portraits live in `public/fighters/<slug>.png`; set `photo: null` when UTMA has
-no portrait and the silhouette placeholder is used instead. The number of selectable knockout
-rounds comes from each fight's `rounds` value.
+`src/data/event.ts` holds the event metadata and the fights, in display order (prelims, then
+the main card; last fight of each card first). Fighter portraits live in
+`public/fighters/<slug>.png`; set `photo: null` when UTMA has no portrait and the silhouette
+placeholder is used instead. The number of selectable knockout rounds comes from each fight's
+`rounds` value.

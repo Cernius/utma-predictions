@@ -101,7 +101,7 @@ export function GuessesBoard() {
                           className="flex items-baseline justify-between gap-3 border-t border-line/70 pt-2.5 first:border-t-0 first:pt-0"
                         >
                           <div className="min-w-0">
-                            {showCard && index > 0 && (
+                            {showCard && (
                               <p className="label mb-2 text-[8px] text-acid">{cardLabel}</p>
                             )}
                             <p className="label text-[8px] text-muted/60">

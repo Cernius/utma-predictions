@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import type { Fight } from "../data/event";
+import { cardSections, fights as eventFights, type Fight } from "../data/event.ts";
 import type { Ballot } from "./ballots";
 import { guessLines, sortGuessBallots, splitFighterName } from "./guesses.ts";
 
@@ -132,5 +132,29 @@ test("puts my ballot first, then the most complete cards", () => {
   assert.deepEqual(
     sortGuessBallots([fuller, older, mine], "me").map((row) => row.voterId),
     ["me", "other", "third"],
+  );
+});
+
+test("shows prelims first, last fight of each card on top", () => {
+  assert.deepEqual(
+    cardSections.map((section) => section.id),
+    ["prelims", "main"],
+  );
+  assert.deepEqual(
+    eventFights.map((fight) => fight.id),
+    [
+      "prelim-26-200",
+      "prelim-103-211",
+      "prelim-59-25",
+      "prelim-101-61",
+      "main-16-54",
+      "main-28-202",
+      "main-181-21",
+      "main-31-23",
+      "main-18-182",
+      "main-24-95",
+      "main-140-210",
+      "main-48-17",
+    ],
   );
 });
