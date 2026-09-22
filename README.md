@@ -1,5 +1,7 @@
 # UTMA #19 — spėjimų žaidimas
 
+**Live: https://cernius.github.io/utma-predictions/**
+
 Unofficial fan prediction game for the [UTMA #19](https://stats.uniquetma.com/fightcard/20/main-card)
 main card. Visitors enter a name, then for every fight pick the winner, the victory type
 (knockout or points) and — for a knockout — the round. Everyone's picks stream in live and the
@@ -52,11 +54,16 @@ and simply count as incomplete until the method is filled in.
 
 ## Deploying to GitHub Pages
 
+Already configured for this repo: Pages source is **GitHub Actions** and the five
+`NEXT_PUBLIC_FIREBASE_*` values are stored as Actions secrets. They are inlined into the client
+bundle at build time, which is expected — Firebase web config is public, and the database rules
+are what protect the data.
+
+For a fresh fork:
+
 1. Push the repo to GitHub.
 2. Settings → Pages → **Source: GitHub Actions**.
 3. Settings → Secrets and variables → Actions: add the five `NEXT_PUBLIC_FIREBASE_*` values.
-   They are inlined into the client bundle at build time, which is expected — Firebase web
-   config is public, and the database rules are what protect the data.
 4. Add the Pages URL to Firebase → Authentication → Settings → Authorised domains if you later
    enable auth.
 
