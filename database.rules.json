@@ -1,0 +1,25 @@
+{
+  "rules": {
+    "predictions": {
+      "$eventId": {
+        ".read": true,
+        "$voterId": {
+          ".write": true,
+          ".validate": "newData.hasChild('name')",
+          "name": { ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 28" },
+          "updatedAt": { ".validate": "newData.isNumber()" },
+          "picks": {
+            "$fightId": {
+              ".validate": "newData.hasChild('corner')",
+              "corner": { ".validate": "newData.val() == 'red' || newData.val() == 'blue'" },
+              "method": { ".validate": "newData.val() == 'ko' || newData.val() == 'points'" },
+              "round": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 12" },
+              "$other": { ".validate": false }
+            }
+          },
+          "$other": { ".validate": false }
+        }
+      }
+    }
+  }
+}

@@ -1,26 +1,71 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Tokens lifted from the UTMA stats subsite (css/prototype.css :root). */
+@theme {
+  --color-bg: #060a0f;
+  --color-surface: #0d1217;
+  --color-surface-2: #13191f;
+  --color-line: #252c33;
+  --color-ink: #0c1012;
+  --color-text: #f4f6f7;
+  --color-muted: #89939e;
+  --color-acid: #c8ff00;
+  --color-danger: #ff5d5d;
+
+  --font-display: var(--font-oswald), "Arial Narrow", sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The source site sets uppercase + tight tracking on nearly every label. */
+@utility label {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+}
+
+@keyframes utma-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.72);
+  }
+}
+
+@keyframes utma-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.utma-pulse {
+  animation: utma-pulse 1.6s ease-in-out infinite;
+}
+
+.utma-rise {
+  animation: utma-rise 0.32s ease-out both;
+}
+
+/* Cross-browser range slider is overkill here; keep focus rings on brand. */
+:focus-visible {
+  outline: 2px solid var(--color-acid);
+  outline-offset: 2px;
 }

@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# UTMA #19 — spėjimų žaidimas
 
-## Getting Started
+Unofficial fan prediction game for the [UTMA #19](https://stats.uniquetma.com/fightcard/20/main-card)
+main card. Visitors enter a name, then for every fight pick the winner, the victory type
+(knockout or points) and — for a knockout — the round. Everyone's picks stream in live and the
+crowd split is revealed per fight once your own prediction is complete.
 
-First, run the development server:
+Static Next.js export hosted on GitHub Pages, with predictions in Firebase Realtime Database.
+
+## Local development
 
 ```bash
+npm install
+cp .env.example .env.local   # optional, see below
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Without Firebase credentials the app still works end to end — predictions are kept in
+`localStorage` so you can build and click through the whole flow offline.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Firebase setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Create a Firebase project and add a **Realtime Database** (not Firestore).
+2. Copy the web app config values into `.env.local` using `.env.example` as the template.
+   `NEXT_PUBLIC_FIREBASE_DATABASE_URL` and `NEXT_PUBLIC_FIREBASE_API_KEY` are the two the app
+   checks before switching off the localStorage fallback.
+3. Publish `database.rules.json` as the database rules (Realtime Database → Rules).
 
-## Learn More
+The rules allow unauthenticated reads and writes under `predictions/<eventId>/<voterId>`, with
+validation on the shape of each pick. That is deliberate for a public fan game with no login:
+anyone who knows a voter id could overwrite that ballot. If the game needs to be tamper-proof,
+enable Anonymous Authentication and tighten the write rule to `auth.uid === $voterId`.
 
-To learn more about Next.js, take a look at the following resources:
+Stored shape:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+predictions/utma-19/<voterId>
+  name: "TITAS"
+  updatedAt: 1758520000000
+  picks/<fightId>
+    corner: "red" | "blue"
+    method: "ko" | "points"
+    round: 1…N        // only present for a knockout
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Ballots written before victory types existed (`picks/<fightId>: "red"`) are still read correctly
+and simply count as incomplete until the method is filled in.
 
-## Deploy on Vercel
+## Deploying to GitHub Pages
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Push the repo to GitHub.
+2. Settings → Pages → **Source: GitHub Actions**.
+3. Settings → Secrets and variables → Actions: add the five `NEXT_PUBLIC_FIREBASE_*` values.
+   They are inlined into the client bundle at build time, which is expected — Firebase web
+   config is public, and the database rules are what protect the data.
+4. Add the Pages URL to Firebase → Authentication → Settings → Authorised domains if you later
+   enable auth.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Every push to `main` runs `.github/workflows/deploy.yml`, which builds the static export and
+publishes `out/`. The workflow passes `NEXT_PUBLIC_BASE_PATH=/<repo>` so assets resolve under the
+project-site sub-path; delete that line if you deploy to a `<user>.github.io` repo or a custom
+domain served from the root.
+
+## Updating the fight card
+
+`src/data/event.ts` holds the event metadata and the fights, in card order. Fighter portraits
+live in `public/fighters/<slug>.png`; set `photo: null` when UTMA has no portrait and the
+silhouette placeholder is used instead. The number of selectable knockout rounds comes from each
+fight's `rounds` value.
