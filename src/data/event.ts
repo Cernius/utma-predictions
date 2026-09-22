@@ -36,7 +36,6 @@ export const event = {
   venue: "KAUNO ŽALGIRIO ARENA",
   cardLabel: "PAGRINDINĖ KORTA",
   ticketsUrl: "https://kakava.lt/renginys/utma-19/12066/24951",
-  ppvUrl: "https://ppv.uniquetma.com/event/27/buy",
   fightcardUrl: "https://stats.uniquetma.com/fightcard/20/main-card",
   fighterProfileBase: "https://stats.uniquetma.com/fighters",
 };

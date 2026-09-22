@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FightRow } from "@/components/FightRow";
 import { Leaderboard } from "@/components/Leaderboard";
@@ -175,14 +176,12 @@ export default function Home() {
           >
             Bilietai
           </a>
-          <a
-            href={event.ppvUrl}
-            target="_blank"
-            rel="noreferrer"
+          <Link
+            href="/spejimai"
             className="label rounded-lg border border-line bg-surface px-4 py-2.5 text-[10px] text-muted transition hover:border-acid/50 hover:text-acid"
           >
-            Tiesioginė transliacija
-          </a>
+            Visi spėjimai
+          </Link>
           <a
             href={event.fightcardUrl}
             target="_blank"
