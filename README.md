@@ -72,6 +72,23 @@ publishes `out/`. The workflow passes `NEXT_PUBLIC_BASE_PATH=/<repo>` so assets 
 project-site sub-path; delete that line if you deploy to a `<user>.github.io` repo or a custom
 domain served from the root.
 
+## Admin page
+
+`/admin` (e.g. `https://cernius.github.io/utma-predictions/admin/`) lists every ballot — name,
+how many picks are complete, when it was last touched, and an expandable per-fight breakdown —
+and can delete one player's votes or all of them. It is not linked from anywhere and is served
+with `robots: noindex, nofollow`.
+
+Entry is gated by `NEXT_PUBLIC_ADMIN_CODE` (an Actions secret in this repo, `.env.local` for
+local dev). Be clear-eyed about what that buys: the code is inlined into the public JS bundle at
+build time, and the database rules already allow unauthenticated writes, so the gate deters a
+curious visitor rather than a determined one. Deleting votes has never required this page — a
+`curl -X DELETE` against the database does the same thing.
+
+To make it genuinely privileged, enable Firebase Authentication and switch the rules from
+`".write": true` to something like `".write": "auth.uid === $voterId || auth.uid === '<adminUid>'"`,
+signing players in anonymously and the admin in with a password.
+
 ## Resetting a device
 
 Append `#reset` to the URL (e.g. `https://cernius.github.io/utma-predictions/#reset`) to reveal a

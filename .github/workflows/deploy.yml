@@ -37,6 +37,8 @@ jobs:
           NEXT_PUBLIC_FIREBASE_DATABASE_URL: ${{ secrets.NEXT_PUBLIC_FIREBASE_DATABASE_URL }}
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          # Passcode for the unlinked /admin page.
+          NEXT_PUBLIC_ADMIN_CODE: ${{ secrets.NEXT_PUBLIC_ADMIN_CODE }}
         run: npm run build
 
       - uses: actions/upload-pages-artifact@v5
