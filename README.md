@@ -3,7 +3,7 @@
 **Live: https://cernius.github.io/utma-predictions/**
 
 Unofficial fan prediction game for the [UTMA #19](https://stats.uniquetma.com/fightcard/20/main-card)
-main card. Visitors enter a name, then for every fight pick the winner, the victory type
+main card and [prelims](https://stats.uniquetma.com/fightcard/20/prelims). Visitors enter a name, then for every fight pick the winner, the victory type
 (knockout or points) and — for a knockout — the round. Everyone's picks stream in live and the
 crowd split is revealed per fight once your own prediction is complete.
 
@@ -99,7 +99,7 @@ your own ballot; other players are unaffected.
 
 ## Updating the fight card
 
-`src/data/event.ts` holds the event metadata and the fights, in card order. Fighter portraits
-live in `public/fighters/<slug>.png`; set `photo: null` when UTMA has no portrait and the
-silhouette placeholder is used instead. The number of selectable knockout rounds comes from each
-fight's `rounds` value.
+`src/data/event.ts` holds the event metadata and the fights, in card order (main card, then
+prelims). Fighter portraits live in `public/fighters/<slug>.png`; set `photo: null` when UTMA has
+no portrait and the silhouette placeholder is used instead. The number of selectable knockout
+rounds comes from each fight's `rounds` value.

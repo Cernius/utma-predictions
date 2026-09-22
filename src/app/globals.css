@@ -13,6 +13,7 @@
   --color-danger: #ff5d5d;
 
   --font-display: var(--font-oswald), "Arial Narrow", sans-serif;
+  --font-last: var(--font-fraunces), ui-serif, Georgia, serif;
 }
 
 html {
@@ -31,6 +32,15 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-weight: 500;
+}
+
+/* Fighter last names — italic serif against the condensed Oswald stack. */
+@utility last-name {
+  font-family: var(--font-last);
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 @keyframes utma-pulse {

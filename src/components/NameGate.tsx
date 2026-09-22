@@ -45,8 +45,8 @@ export function NameGate({
           {onCancel ? "Tavo vardas" : "Kas nugalės?"}
         </h1>
         <p className="mt-3 text-[14px] leading-snug font-light text-muted">
-          Įvesk savo vardą, atspėk visų pagrindinės kortos kovų nugalėtojus, pergalės būdą ir
-          nokauto raundą — tada pamatyk, ką spėja kiti.
+          Įvesk savo vardą, atspėk visų kovų nugalėtojus, pergalės būdą ir nokauto raundą —
+          tada pamatyk, ką spėja kiti.
         </p>
 
         <label className="label mt-7 block text-[10px] text-muted" htmlFor="voter-name">

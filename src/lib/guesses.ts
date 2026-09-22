@@ -1,12 +1,21 @@
-import type { Fight } from "../data/event";
+import type { CardId, Fight } from "../data/event";
 import type { Ballot, Pick } from "./ballots";
 
 export type GuessLine = {
   fightId: string;
+  card: CardId;
   order: string;
   winner: string | null;
+  firstName: string | null;
+  lastName: string | null;
   methodLabel: string | null;
 };
+
+export function splitFighterName(name: string): { firstName: string | null; lastName: string } {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length <= 1) return { firstName: null, lastName: parts[0] ?? name };
+  return { firstName: parts.slice(0, -1).join(" "), lastName: parts[parts.length - 1] };
+}
 
 function formatMethod(pick: Pick): string | null {
   if (pick.method === "ko") return pick.round ? `Nokautu ${pick.round} r.` : "Nokautu";
@@ -26,13 +35,25 @@ export function guessLines(ballot: Ballot, card: Fight[]): GuessLine[] {
   return card.map((fight) => {
     const pick = ballot.picks[fight.id];
     if (!pick) {
-      return { fightId: fight.id, order: fight.order, winner: null, methodLabel: null };
+      return {
+        fightId: fight.id,
+        card: fight.card,
+        order: fight.order,
+        winner: null,
+        firstName: null,
+        lastName: null,
+        methodLabel: null,
+      };
     }
     const fighter = pick.corner === "red" ? fight.red : fight.blue;
+    const { firstName, lastName } = splitFighterName(fighter.name);
     return {
       fightId: fight.id,
+      card: fight.card,
       order: fight.order,
       winner: fighter.name,
+      firstName,
+      lastName,
       methodLabel: formatMethod(pick),
     };
   });

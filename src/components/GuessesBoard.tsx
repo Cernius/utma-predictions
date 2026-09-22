@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { NameGate } from "@/components/NameGate";
-import { event, fights } from "@/data/event";
+import { cardSections, event, fights } from "@/data/event";
 import type { Ballot } from "@/lib/ballots";
 import { isPickComplete, subscribeToBallots } from "@/lib/ballots";
 import { guessLines, sortGuessBallots } from "@/lib/guesses";
@@ -91,27 +91,38 @@ export function GuessesBoard() {
                   </div>
 
                   <ul className="mt-4 grid gap-2.5">
-                    {guessLines(ballot, fights).map((line) => (
-                      <li
-                        key={line.fightId}
-                        className="flex items-baseline justify-between gap-3 border-t border-line/70 pt-2.5 first:border-t-0 first:pt-0"
-                      >
-                        <div className="min-w-0">
-                          <p className="label text-[8px] text-muted/60">{line.order}</p>
-                          <p
-                            className={[
-                              "mt-0.5 text-[14px] leading-snug font-medium uppercase",
-                              line.winner ? "text-text" : "text-muted/40",
-                            ].join(" ")}
-                          >
-                            {line.winner ?? "—"}
+                    {guessLines(ballot, fights).map((line, index, lines) => {
+                      const showCard = line.card !== lines[index - 1]?.card;
+                      const cardLabel =
+                        cardSections.find((section) => section.id === line.card)?.label ?? line.card;
+                      return (
+                        <li
+                          key={line.fightId}
+                          className="flex items-baseline justify-between gap-3 border-t border-line/70 pt-2.5 first:border-t-0 first:pt-0"
+                        >
+                          <div className="min-w-0">
+                            {showCard && index > 0 && (
+                              <p className="label mb-2 text-[8px] text-acid">{cardLabel}</p>
+                            )}
+                            <p className="label text-[8px] text-muted/60">
+                              {line.order}
+                              {line.firstName ? ` · ${line.firstName}` : ""}
+                            </p>
+                            <p
+                              className={[
+                                "mt-0.5 text-[16px] leading-snug",
+                                line.lastName ? "last-name text-acid" : "text-muted/40",
+                              ].join(" ")}
+                            >
+                              {line.lastName ?? "—"}
+                            </p>
+                          </div>
+                          <p className="label flex-none text-[9px] text-muted">
+                            {line.methodLabel ?? ""}
                           </p>
-                        </div>
-                        <p className="label flex-none text-[9px] text-muted">
-                          {line.methodLabel ?? ""}
-                        </p>
-                      </li>
-                    ))}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </li>
               );

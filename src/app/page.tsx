@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FightRow } from "@/components/FightRow";
 import { Leaderboard } from "@/components/Leaderboard";
 import { NameGate } from "@/components/NameGate";
-import { event, fights } from "@/data/event";
+import { cardSections, event, fights } from "@/data/event";
 import type { Ballot, Pick } from "@/lib/ballots";
 import {
   clearLocalBallots,
@@ -151,8 +151,8 @@ export default function Home() {
           nugalėtojus
         </h1>
         <p className="mt-3 max-w-[46ch] text-[14px] leading-snug font-light text-muted">
-          Pasirink, kas nugalės kiekvieną {event.cardLabel.toLowerCase()} kovą, kaip iškovos
-          pergalę — nokautu ar taškais — ir nokauto atveju, kuriame raunde.
+          Pasirink, kas nugalės kiekvieną kovą, kaip iškovos pergalę — nokautu ar
+          taškais — ir nokauto atveju, kuriame raunde.
         </p>
 
         <dl className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
@@ -227,31 +227,40 @@ export default function Home() {
       )}
 
       <main className="mt-8">
-        <header className="mb-3 flex items-end justify-between gap-4">
-          <div>
-            <p className="label text-[10px] text-acid">{event.cardLabel}</p>
-            <h2 className="text-[24px] leading-none font-semibold uppercase sm:text-[28px]">
-              Kovos
-            </h2>
-          </div>
-          <a href="#spejejai" className="label text-[9px] text-muted transition hover:text-acid">
-            Spėjėjai ↓
-          </a>
-        </header>
+        {cardSections.map((section, sectionIndex) => {
+          const sectionFights = fights.filter((fight) => fight.card === section.id);
+          return (
+            <section key={section.id} className={sectionIndex === 0 ? "" : "mt-10"}>
+              <header className="mb-3 flex items-end justify-between gap-4">
+                <div>
+                  <p className="label text-[10px] text-acid">{section.label}</p>
+                  <h2 className="text-[24px] leading-none font-semibold uppercase sm:text-[28px]">
+                    Kovos
+                  </h2>
+                </div>
+                {sectionIndex === 0 && (
+                  <a href="#spejejai" className="label text-[9px] text-muted transition hover:text-acid">
+                    Spėjėjai ↓
+                  </a>
+                )}
+              </header>
 
-        <div className="grid gap-3">
-          {fights.map((fight, index) => (
-            <FightRow
-              key={fight.id}
-              fight={fight}
-              index={index}
-              myPick={myPicks[fight.id]}
-              ballots={displayBallots}
-              pending={pendingFight === fight.id}
-              onPick={(pick) => handlePick(fight.id, pick)}
-            />
-          ))}
-        </div>
+              <div className="grid gap-3">
+                {sectionFights.map((fight, index) => (
+                  <FightRow
+                    key={fight.id}
+                    fight={fight}
+                    index={index}
+                    myPick={myPicks[fight.id]}
+                    ballots={displayBallots}
+                    pending={pendingFight === fight.id}
+                    onPick={(pick) => handlePick(fight.id, pick)}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })}
       </main>
 
       <div className="mt-12">

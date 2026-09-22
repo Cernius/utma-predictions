@@ -23,7 +23,7 @@ function pickSummary(ballot: Ballot, fightId: string): string | null {
   const fighter = pick.corner === "red" ? fight.red : fight.blue;
   const method =
     pick.method === "ko" ? (pick.round ? `KO ${pick.round} r.` : "KO (be raundo)") : null;
-  return `${fight.order} · ${fighter.name}${method ? ` · ${method}` : pick.method === "points" ? " · Taškai" : " · be būdo"}`;
+  return `${fight.card === "prelims" ? "PRELIMS " : ""}${fight.order} · ${fighter.name}${method ? ` · ${method}` : pick.method === "points" ? " · Taškai" : " · be būdo"}`;
 }
 
 function CodeGate({ onUnlock }: { onUnlock: () => void }) {

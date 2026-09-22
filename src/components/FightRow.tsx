@@ -5,6 +5,7 @@ import type { Ballot, Method, Pick } from "@/lib/ballots";
 import { isPickComplete } from "@/lib/ballots";
 import type { Corner, Fight, Fighter } from "@/data/event";
 import { roundOptions } from "@/data/event";
+import { splitFighterName } from "@/lib/guesses";
 import { asset } from "@/lib/paths";
 
 type Props = {
@@ -176,7 +177,10 @@ export function FightRow({ fight, index, myPick, ballots, pending, onPick }: Pro
     let ko = 0;
     let points = 0;
     const rounds = new Map<number, number>();
-    const crowd: Record<Corner, { name: string; summary: string }[]> = { red: [], blue: [] };
+    const crowd: Record<Corner, { name: string; lastName: string; summary: string }[]> = {
+      red: [],
+      blue: [],
+    };
 
     for (const ballot of ballots) {
       const pick = ballot.picks[fight.id];
@@ -189,7 +193,12 @@ export function FightRow({ fight, index, myPick, ballots, pending, onPick }: Pro
       } else if (pick.method === "points") {
         points += 1;
       }
-      crowd[pick.corner].push({ name: ballot.name, summary: pickSummary(pick) });
+      const fighter = pick.corner === "red" ? fight.red : fight.blue;
+      crowd[pick.corner].push({
+        name: ballot.name,
+        lastName: splitFighterName(fighter.name).lastName,
+        summary: pickSummary(pick),
+      });
     }
 
     const topRound = [...rounds.entries()].sort((a, b) => b[1] - a[1] || a[0] - b[0])[0];
@@ -207,7 +216,7 @@ export function FightRow({ fight, index, myPick, ballots, pending, onPick }: Pro
       bluePercent: total ? 100 - redPercent : 50,
       crowd,
     };
-  }, [ballots, fight.id]);
+  }, [ballots, fight.blue, fight.id, fight.red]);
 
   const complete = isPickComplete(myPick);
   const facts = [
@@ -360,6 +369,13 @@ export function FightRow({ fight, index, myPick, ballots, pending, onPick }: Pro
                       className={`label rounded border px-1.5 py-0.5 text-[9px] ${cornerTone[corner].chip}`}
                     >
                       {entry.name}
+                      <span
+                        className={`last-name ml-1 ${
+                          corner === "red" ? "text-text" : "text-acid"
+                        }`}
+                      >
+                        {entry.lastName}
+                      </span>
                       <span className="ml-1 opacity-60">{entry.summary}</span>
                     </span>
                   ))}
