@@ -46,12 +46,14 @@ export function GuessesBoard() {
           <br />
           spėjimai
         </h1>
-        <Link
-          href="/"
-          className="label mt-4 inline-block text-[9px] text-muted transition hover:text-acid"
-        >
-          ← Į kortą
-        </Link>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Link href="/" className="label text-[9px] text-muted transition hover:text-acid">
+            ← Į kortą
+          </Link>
+          <Link href="/rezultatai" className="label text-[9px] text-acid transition hover:brightness-110">
+            Rezultatai →
+          </Link>
+        </div>
       </header>
 
       <section className="mt-10">

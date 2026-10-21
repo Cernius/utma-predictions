@@ -177,6 +177,12 @@ export default function Home() {
             Bilietai
           </a>
           <Link
+            href="/rezultatai"
+            className="label rounded-lg border border-acid/50 bg-surface px-4 py-2.5 text-[10px] text-acid transition hover:bg-acid/10"
+          >
+            Rezultatai
+          </Link>
+          <Link
             href="/spejimai"
             className="label rounded-lg border border-line bg-surface px-4 py-2.5 text-[10px] text-muted transition hover:border-acid/50 hover:text-acid"
           >

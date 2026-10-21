@@ -72,6 +72,31 @@ publishes `out/`. The workflow passes `NEXT_PUBLIC_BASE_PATH=/<repo>` so assets 
 project-site sub-path; delete that line if you deploy to a `<user>.github.io` repo or a custom
 domain served from the root.
 
+## Results page
+
+`/rezultatai` scores every ballot against the official outcomes and ranks the players. Each
+fight is worth up to three points, and each point only counts once the one before it is right:
+
+| | |
+|---|---|
+| right winner | 1 |
+| …and the right method (`ko` / `points`) | +1 |
+| …and the right knockout round | +1 |
+
+A decision therefore tops out at two points — there is no round to call — so the perfect score
+is the sum of the per-fight maxima rather than `3 × fights`. For UTMA #19 (nine stoppages, three
+decisions) that is **33**, which is what the page shows as the denominator. An unfinished pick —
+no method chosen, or a knockout without a round — still names a fighter, so it keeps the winner
+point and forfeits the rest. That includes ballots cast before victory types existed, which
+stored the corner on its own.
+
+Ties break on winners called first (a card that read more fights right beats one carried by a
+single exact knockout), then on whoever filed their ballot earliest.
+
+Outcomes live in `src/data/results.ts`, keyed by the fight ids in `src/data/event.ts` and
+transcribed from the UTMA stats cards. A fight with no entry there is simply left out of the
+scoring, so the page works part-way through an event too.
+
 ## Admin page
 
 `/admin` (e.g. `https://cernius.github.io/utma-predictions/admin/`) lists every ballot — name,
