@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { fights } from "@/data/event";
+import { event, fights } from "@/data/event";
 import type { Ballot } from "@/lib/ballots";
 import { deleteBallot, isPickComplete, subscribeToBallots } from "@/lib/ballots";
 import { isFirebaseConfigured } from "@/lib/firebase";
@@ -82,7 +82,7 @@ export function AdminPanel() {
 
   useEffect(() => {
     if (!unlocked) return;
-    return subscribeToBallots(setBallots);
+    return subscribeToBallots(event.id, setBallots);
   }, [unlocked]);
 
   const rows = useMemo(

@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { fights } from "../data/event.ts";
-import type { FightResult } from "../data/results.ts";
-import { results } from "../data/results.ts";
+import { archivedFights as fights, archivedResults as results } from "../data/archive/utma-19.ts";
 import type { Corner } from "../data/event.ts";
+import { fights as liveFights } from "../data/event.ts";
+import type { FightResult } from "../data/results.ts";
+import { results as liveResults } from "../data/results.ts";
 import type { Ballot, Method, Pick } from "./ballots";
 import { maxPoints, rankBallots, scoreBallot, scorePick } from "./scoring.ts";
 
@@ -206,13 +207,21 @@ test("shares a rank between ballots that are level on every tiebreak", () => {
   assert.deepEqual(ranked.map((row) => row.rank), [1, 1]);
 });
 
-test("has an official result for every fight on the card", () => {
+test("the archived card has an official result for every fight", () => {
   assert.deepEqual(
     fights.filter((fight) => !results[fight.id]).map((fight) => fight.id),
     [],
   );
   assert.deepEqual(
     Object.keys(results).filter((id) => !fights.some((fight) => fight.id === id)),
+    [],
+  );
+});
+
+/** The live card fills in through the night, so only stray keys are an error. */
+test("every live result is keyed to a fight on the live card", () => {
+  assert.deepEqual(
+    Object.keys(liveResults).filter((id) => !liveFights.some((fight) => fight.id === id)),
     [],
   );
 });

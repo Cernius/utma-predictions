@@ -18,9 +18,9 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "UTMA #19 · SPĖK KOVŲ NUGALĖTOJUS",
+  title: "UTMA #20 · SPĖK KOVŲ NUGALĖTOJUS",
   description:
-    "Neoficialus UTMA #19 pagrindinės kortos ir prelims spėjimų žaidimas — pasirink nugalėtojus ir pamatyk, ką spėja kiti.",
+    "Neoficialus UTMA #20 pagrindinės kortos ir prelims spėjimų žaidimas — pasirink nugalėtojus ir pamatyk, ką spėja kiti.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

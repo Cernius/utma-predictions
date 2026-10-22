@@ -24,6 +24,22 @@ export type Fight = {
   blue: Fighter;
 };
 
+/** Everything about an event that isn't the fights themselves. */
+export type EventMeta = {
+  id: string;
+  name: string;
+  tagline: string;
+  date: string;
+  venue: string;
+  cardLabel: string;
+  ticketsUrl: string;
+  fightcardUrl: string;
+  prelimsUrl: string;
+  fighterProfileBase: string;
+};
+
+export type CardSection = { id: CardId; label: string; url: string };
+
 /** Selectable KO rounds for a fight — 1…N, from the scheduled distance. */
 export function roundOptions(fight: Fight): number[] {
   const total = Number.parseInt(fight.rounds, 10);
@@ -31,168 +47,171 @@ export function roundOptions(fight: Fight): number[] {
   return Array.from({ length: count }, (_, i) => i + 1);
 }
 
-export const event = {
-  id: "utma-19",
-  name: "UTMA #19",
+export const event: EventMeta = {
+  id: "utma-20",
+  name: "UTMA #20",
   tagline: "KICKBOXING · MUAY THAI",
-  date: "2026 09 26 · 19:00",
-  venue: "KAUNO ŽALGIRIO ARENA",
+  date: "2026 10 24 · 19:00",
+  venue: "ARENA VILNIUS",
   cardLabel: "PAGRINDINĖ KORTA",
-  ticketsUrl: "https://kakava.lt/renginys/utma-19/12066/24951",
-  fightcardUrl: "https://stats.uniquetma.com/fightcard/20/main-card",
-  prelimsUrl: "https://stats.uniquetma.com/fightcard/20/prelims",
+  ticketsUrl: "https://www.bilietai.lt/series/Q5YZFI7GXO/utma-20",
+  fightcardUrl: "https://stats.uniquetma.com/fightcard/21/main-card",
+  prelimsUrl: "https://stats.uniquetma.com/fightcard/21/prelims",
   fighterProfileBase: "https://stats.uniquetma.com/fighters",
 };
 
-export const cardSections: { id: CardId; label: string; url: string }[] = [
+export const cardSections: CardSection[] = [
   { id: "prelims", label: "PRELIMS", url: event.prelimsUrl },
   { id: "main", label: "PAGRINDINĖ KORTA", url: event.fightcardUrl },
 ];
 
-/** Display order: prelims first, then the main card — last fight of each card on top. */
+/**
+ * Display order: prelims first, then the main card — last fight of each card on top.
+ * UTMA also runs an early prelims card; it is deliberately left out of the game.
+ */
 export const fights: Fight[] = [
   {
-    id: "prelim-26-200",
+    id: "prelim-223-97",
     card: "prelims",
     order: "#4",
     isMain: false,
-    weight: "91 KG",
+    weight: "58 KG",
     rules: "KICKBOXING",
     rounds: "3",
     roundTime: "3:00",
-    red: { id: 26, name: "NAGLIS KANIŠAUSKAS", photo: "naglis-kanisauskas.png" },
-    blue: { id: 200, name: "DOVYDAS GIRDZEVIČIUS", photo: "dovydas-girdzevicius.png" },
+    red: { id: 223, name: "AYA BOUTAFALA", photo: null },
+    blue: { id: 97, name: "ALINA MARTYNIUK", photo: "alina-martyniuk.png" },
   },
   {
-    id: "prelim-103-211",
+    id: "prelim-38-29",
     card: "prelims",
     order: "#3",
     isMain: false,
-    weight: "75 KG",
+    weight: "67 KG",
     rules: "KICKBOXING",
     rounds: "3",
     roundTime: "3:00",
-    red: { id: 103, name: "NAURIS LUKOŠIŪNAS", photo: "nauris-lukosiunas.png" },
-    blue: { id: 211, name: "WOJCIECH KOSOWSKI", photo: null },
+    red: { id: 38, name: "MATAS PULTARAŽINSKAS", photo: "matas-pultarazinskas.png" },
+    blue: { id: 29, name: "OSVALD FEDOROVIČ", photo: "osvald-fedorovic.png" },
   },
   {
-    id: "prelim-59-25",
+    id: "prelim-224-54",
     card: "prelims",
     order: "#2",
+    isMain: false,
+    weight: "81 KG",
+    rules: "KICKBOXING",
+    rounds: "3",
+    roundTime: "3:00",
+    red: { id: 224, name: "MINDAUGAS GEDMINAS", photo: null },
+    blue: { id: 54, name: "ARNOLDAS MISIŪNAS", photo: "arnoldas-misiunas.png" },
+  },
+  {
+    id: "prelim-225-34",
+    card: "prelims",
+    order: "#1",
     isMain: false,
     weight: "95 KG",
     rules: "KICKBOXING",
     rounds: "3",
     roundTime: "3:00",
-    red: { id: 59, name: "IGNAS PAULIUKEVIČIUS", photo: "ignas-pauliukevicius.png" },
-    blue: { id: 25, name: "MODESTAS JUODPUSIS", photo: "modestas-juodpusis.png" },
+    red: { id: 225, name: "BURAK ÜNAL", photo: null },
+    blue: { id: 34, name: "EDVINAS ŠALKOVSKI", photo: "edvinas-salkovski.png" },
   },
   {
-    id: "prelim-101-61",
-    card: "prelims",
-    order: "#1",
-    isMain: false,
-    weight: "67 KG",
-    rules: "KICKBOXING",
-    rounds: "3",
-    roundTime: "3:00",
-    red: { id: 101, name: "DEIVIDAS DANYLA", photo: "deividas-danyla.png" },
-    blue: { id: 61, name: "EVALDAS BALSYS", photo: "evaldas-balsys.png" },
-  },
-  {
-    id: "main-16-54",
+    id: "main-226-153",
     card: "main",
     order: "#8",
     isMain: false,
-    weight: "81 KG",
+    weight: "95+ KG",
     rules: "KICKBOXING",
     rounds: "3",
     roundTime: "3:00",
-    red: { id: 16, name: "DEIVIDAS JEMELJANOVAS", photo: "deividas-jameljanovas.png" },
-    blue: { id: 54, name: "ARNOLDAS MISIŪNAS", photo: "arnoldas-misiunas.png" },
+    red: { id: 226, name: "ION GRIGORE", photo: null },
+    blue: { id: 153, name: "TOMAS PAKUTINSKAS", photo: null },
   },
   {
-    id: "main-28-202",
+    id: "main-227-133",
     card: "main",
     order: "#7",
     isMain: false,
-    weight: "81 KG",
+    weight: "95+ KG",
     rules: "KICKBOXING",
     rounds: "3",
     roundTime: "3:00",
-    red: { id: 28, name: "OSKARAS BUINICKAS", photo: "oskaras-buinickas.png" },
-    blue: { id: 202, name: "RODRIGO MINEIRO", photo: null },
+    red: { id: 227, name: "MARKAS MOLOTOKAS", photo: null },
+    blue: { id: 133, name: "MANTAS RIMDEIKA", photo: "mantas-rimdeika.png" },
   },
   {
-    id: "main-181-21",
+    id: "main-23-50",
     card: "main",
     order: "#6",
     isMain: false,
-    weight: "81 KG",
+    weight: "75 KG",
     rules: "KICKBOXING",
     rounds: "3",
     roundTime: "3:00",
-    red: { id: 181, name: "RIČARDAS KULIS", photo: "ricardas-kulis.png" },
-    blue: { id: 21, name: "ISA GÖÇMEN", photo: "isa-gocmen.png" },
+    red: { id: 23, name: "MANTVYDAS PEREDNIS", photo: "mantvydas-perednis.png" },
+    blue: { id: 50, name: "RAIMONDAS KRILAVIČIUS", photo: "raimondas-krilavicius.png" },
   },
   {
-    id: "main-31-23",
+    id: "main-187-33",
     card: "main",
     order: "#5",
     isMain: false,
+    weight: "67 KG",
+    rules: "KICKBOXING",
+    rounds: "3",
+    roundTime: "3:00",
+    red: { id: 187, name: "CENGIZ LALE", photo: "cengiz-lale.png" },
+    blue: { id: 33, name: "VITAS KAROSAS", photo: "vitas-karosas.png" },
+  },
+  {
+    id: "main-202-16",
+    card: "main",
+    order: "#4",
+    isMain: false,
     weight: "81 KG",
     rules: "KICKBOXING",
     rounds: "3",
     roundTime: "3:00",
-    red: { id: 31, name: "TOMAS BANSKIS", photo: "tomas-banskis.png" },
-    blue: { id: 23, name: "MANTVYDAS PEREDNIS", photo: "mantvydas-perednis.png" },
+    red: { id: 202, name: "RODRIGO MINEIRO", photo: null },
+    blue: { id: 16, name: "DEIVIDAS JEMELJANOVAS", photo: "deividas-jameljanovas.png" },
   },
   {
-    id: "main-18-182",
-    card: "main",
-    order: "#4",
-    isMain: false,
-    weight: "63.5 KG",
-    rules: "KICKBOXING",
-    rounds: "5",
-    roundTime: "3:00",
-    red: { id: 18, name: "DOVYDAS LEVICKIS", photo: "dovydas-levickis.png" },
-    blue: { id: 182, name: "MODESTAS ŽMUIDINA", photo: "modestas-zmuidina.png" },
-  },
-  {
-    id: "main-24-95",
+    id: "main-21-31",
     card: "main",
     order: "#3",
     isMain: false,
-    weight: "67 KG",
-    rules: "KICKBOXING",
-    rounds: "5",
-    roundTime: "3:00",
-    red: { id: 24, name: "MARTYNAS DANIUS", photo: "martynas-danius.png" },
-    blue: { id: 95, name: "KHYZER HAYAT", photo: "khyzer-hayat.png" },
-  },
-  {
-    id: "main-140-210",
-    card: "main",
-    order: "#2",
-    isMain: false,
-    weight: "68 KG",
-    rules: "PROFESSIONAL BOXING",
-    rounds: "10",
-    roundTime: "3:00",
-    red: { id: 140, name: "EIMANTAS STANIONIS", photo: "eimantas-stanionis.png" },
-    blue: { id: 210, name: "KAINE FOURIE", photo: null },
-  },
-  {
-    id: "main-48-17",
-    card: "main",
-    order: "PAGRINDINĖ KOVA",
-    isMain: true,
-    weight: "94 KG",
+    weight: "81 KG",
     rules: "KICKBOXING",
     rounds: "3",
     roundTime: "3:00",
-    red: { id: 48, name: "SERGEJ MASLOBOJEV", photo: "sergej-maslobojev.png" },
-    blue: { id: 17, name: "DOMINYKAS DIRKSTYS", photo: "dominykas-dirkstys.png" },
+    red: { id: 21, name: "ISA GÖÇMEN", photo: "isa-gocmen.png" },
+    blue: { id: 31, name: "TOMAS BANSKIS", photo: "tomas-banskis.png" },
+  },
+  {
+    id: "main-190-36",
+    card: "main",
+    order: "#2",
+    isMain: false,
+    weight: "75 KG",
+    rules: "KICKBOXING",
+    rounds: "3",
+    roundTime: "3:00",
+    red: { id: 190, name: "AKRAM BELMEKI", photo: "akram-belmeki.png" },
+    blue: { id: 36, name: "RAIMONDAS AVLASEVIČIUS", photo: "raimondas-avlasevicius.png" },
+  },
+  {
+    id: "main-26-59",
+    card: "main",
+    order: "PAGRINDINĖ KOVA",
+    isMain: true,
+    weight: "95 KG",
+    rules: "KICKBOXING",
+    rounds: "3",
+    roundTime: "3:00",
+    red: { id: 26, name: "NAGLIS KANIŠAUSKAS", photo: "naglis-kanisauskas.png" },
+    blue: { id: 59, name: "IGNAS PAULIUKEVIČIUS", photo: "ignas-pauliukevicius.png" },
   },
 ];

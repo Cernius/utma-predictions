@@ -25,7 +25,7 @@ type RawBallot = {
   picks?: unknown;
 };
 
-const LOCAL_KEY = `utma:ballots:${event.id}`;
+const localKey = (eventId: string) => `utma:ballots:${eventId}`;
 const LOCAL_EVENT = "utma:ballots-changed";
 
 /** A pick only counts once the victory type — and the round behind a KO — is known. */
@@ -84,27 +84,31 @@ function toRaw(pick: Pick) {
   };
 }
 
-function readLocal(): Record<string, RawBallot> {
+function readLocal(eventId: string = event.id): Record<string, RawBallot> {
   if (typeof window === "undefined") return {};
   try {
-    return JSON.parse(window.localStorage.getItem(LOCAL_KEY) ?? "{}");
+    return JSON.parse(window.localStorage.getItem(localKey(eventId)) ?? "{}");
   } catch {
     return {};
   }
 }
 
 function writeLocal(all: Record<string, RawBallot>) {
-  window.localStorage.setItem(LOCAL_KEY, JSON.stringify(all));
+  window.localStorage.setItem(localKey(event.id), JSON.stringify(all));
   window.dispatchEvent(new Event(LOCAL_EVENT));
 }
 
 /**
- * Streams every ballot for the event. Falls back to localStorage when Firebase
- * env vars are absent, so the app is fully usable before the project is wired up.
+ * Streams every ballot for the given event — the live one for the picking pages,
+ * a past id for the archive. Falls back to localStorage when Firebase env vars are
+ * absent, so the app is fully usable before the project is wired up.
  */
-export function subscribeToBallots(onChange: (ballots: Ballot[]) => void): () => void {
+export function subscribeToBallots(
+  eventId: string,
+  onChange: (ballots: Ballot[]) => void,
+): () => void {
   if (!isFirebaseConfigured) {
-    const emit = () => onChange(toBallots(readLocal()));
+    const emit = () => onChange(toBallots(readLocal(eventId)));
     emit();
     // `storage` covers other tabs, the custom event covers this one.
     window.addEventListener("storage", emit);
@@ -122,7 +126,7 @@ export function subscribeToBallots(onChange: (ballots: Ballot[]) => void): () =>
     const [db, { ref, onValue }] = await Promise.all([getDb(), import("firebase/database")]);
     if (cancelled) return;
     detach = onValue(
-      ref(db, `predictions/${event.id}`),
+      ref(db, `predictions/${eventId}`),
       (snapshot) => onChange(toBallots(snapshot.val())),
       (error) => console.error("Failed to read predictions", error),
     );
@@ -170,7 +174,7 @@ export async function savePick(
 /** Drops the whole localStorage fallback store, including pre-Firebase leftovers. */
 export function clearLocalBallots(): void {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem(LOCAL_KEY);
+  window.localStorage.removeItem(localKey(event.id));
   window.dispatchEvent(new Event(LOCAL_EVENT));
 }
 

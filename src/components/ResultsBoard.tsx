@@ -3,22 +3,24 @@
 import Link from "next/link";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { NameGate } from "@/components/NameGate";
-import { cardSections, event, fights } from "@/data/event";
-import { results } from "@/data/results";
+import type { CardSection, EventMeta, Fight } from "@/data/event";
+import type { FightResult } from "@/data/results";
 import type { Ballot } from "@/lib/ballots";
 import { subscribeToBallots } from "@/lib/ballots";
 import { splitFighterName } from "@/lib/guesses";
 import { asset } from "@/lib/paths";
 import type { ScoreLine } from "@/lib/scoring";
 import { maxPoints, rankBallots } from "@/lib/scoring";
-import { useVoter } from "@/lib/voter";
+import { usePastVoterId, useVoter } from "@/lib/voter";
 
-const scoredFights = fights.filter((fight) => results[fight.id]);
-const perfectScore = scoredFights.reduce((sum, fight) => sum + maxPoints(results[fight.id]), 0);
-
-function cardLabel(card: string): string {
-  return cardSections.find((section) => section.id === card)?.label ?? card;
-}
+export type ResultsBoardProps = {
+  event: EventMeta;
+  cardSections: CardSection[];
+  fights: Fight[];
+  results: Record<string, FightResult>;
+  /** A finished event: read-only, no name gate, and nothing to link onward to. */
+  archived?: boolean;
+};
 
 /** Last name in the serif italic, first name as the small label above it. */
 function FighterName({ name, tone }: { name: string; tone: "acid" | "text" | "muted" }) {
@@ -78,15 +80,35 @@ function BreakdownRow({ line }: { line: ScoreLine }) {
   );
 }
 
-export function ResultsBoard() {
+export function ResultsBoard({
+  event,
+  cardSections,
+  fights,
+  results,
+  archived = false,
+}: ResultsBoardProps) {
   const { voter, ready, signIn } = useVoter();
   const [ballots, setBallots] = useState<Ballot[]>([]);
+  /** Who this device was during the archived event — only used to mark your own row. */
+  const pastVoterId = usePastVoterId(archived ? event.id : null);
 
-  useEffect(() => subscribeToBallots(setBallots), []);
+  useEffect(() => subscribeToBallots(event.id, setBallots), [event.id]);
 
-  const rows = useMemo(() => rankBallots(ballots, fights, results), [ballots]);
+  const scoredFights = useMemo(
+    () => fights.filter((fight) => results[fight.id]),
+    [fights, results],
+  );
+  const perfectScore = useMemo(
+    () => scoredFights.reduce((sum, fight) => sum + maxPoints(results[fight.id]), 0),
+    [scoredFights, results],
+  );
+  const rows = useMemo(() => rankBallots(ballots, fights, results), [ballots, fights, results]);
 
-  if (!ready) {
+  const cardLabel = (card: string) =>
+    cardSections.find((section) => section.id === card)?.label ?? card;
+  const myVoterId = archived ? pastVoterId : (voter?.id ?? null);
+
+  if (!archived && !ready) {
     return (
       <div className="grid min-h-dvh place-items-center">
         <span className="utma-pulse h-3 w-3 rounded-full bg-acid" />
@@ -94,7 +116,7 @@ export function ResultsBoard() {
     );
   }
 
-  if (!voter) {
+  if (!archived && !voter) {
     return <NameGate onSubmit={signIn} />;
   }
 
@@ -104,7 +126,7 @@ export function ResultsBoard() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={asset("/brand/utma-logo.svg")} alt="UTMA" className="h-auto w-[86px]" />
         <p className="label mt-7 text-[10px] text-acid">
-          {event.name} · {event.tagline}
+          {event.name} · {archived ? "ARCHYVAS" : event.tagline}
         </p>
         <h1 className="mt-2 text-[38px] leading-[0.92] font-semibold uppercase sm:text-[54px]">
           Kas
@@ -112,19 +134,30 @@ export function ResultsBoard() {
           atspėjo
         </h1>
         <p className="mt-3 max-w-[46ch] text-[14px] leading-snug font-light text-muted">
-          Taškai už kiekvieną kovą: 1 už nugalėtoją, dar 1 už pergalės būdą ir dar 1 už
-          nokauto raundą. Iš viso galima surinkti {perfectScore}.
+          {scoredFights.length === 0
+            ? "Kol kas nė viena kova neįvertinta. Lentelė pildysis kovų vakarą: 1 taškas už nugalėtoją, dar 1 už pergalės būdą ir dar 1 už nokauto raundą."
+            : `Taškai už kiekvieną kovą: 1 už nugalėtoją, dar 1 už pergalės būdą ir dar 1 už nokauto raundą. Iš viso galima surinkti ${perfectScore}.`}
         </p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link href="/" className="label text-[9px] text-muted transition hover:text-acid">
             ← Į kortą
           </Link>
-          <Link
-            href="/spejimai"
-            className="label text-[9px] text-muted transition hover:text-acid"
-          >
-            Visi spėjimai →
-          </Link>
+          {!archived && (
+            <>
+              <Link
+                href="/spejimai"
+                className="label text-[9px] text-muted transition hover:text-acid"
+              >
+                Visi spėjimai →
+              </Link>
+              <Link
+                href="/archyvas/utma-19"
+                className="label text-[9px] text-muted transition hover:text-acid"
+              >
+                UTMA #19 →
+              </Link>
+            </>
+          )}
         </div>
       </header>
 
@@ -141,14 +174,18 @@ export function ResultsBoard() {
           </p>
         </header>
 
-        {rows.length === 0 ? (
+        {scoredFights.length === 0 ? (
+          <p className="rounded-2xl border border-line bg-surface p-5 text-[13px] font-light text-muted">
+            Lentelė atsiras, kai bus paskelbti pirmieji kovų rezultatai.
+          </p>
+        ) : rows.length === 0 ? (
           <p className="rounded-2xl border border-line bg-surface p-5 text-[13px] font-light text-muted">
             Niekas nespėjo šio turnyro.
           </p>
         ) : (
           <ul className="grid gap-3">
             {rows.map((row) => {
-              const isMe = row.voterId === voter.id;
+              const isMe = row.voterId === myVoterId;
               const isWinner = row.rank === 1;
               return (
                 <li
@@ -210,40 +247,42 @@ export function ResultsBoard() {
         )}
       </section>
 
-      <section className="mt-12">
-        <header className="mb-3">
-          <p className="label text-[10px] text-acid">Oficialu</p>
-          <h2 className="text-[24px] leading-none font-semibold uppercase sm:text-[28px]">
-            Kovų rezultatai
-          </h2>
-        </header>
-        <ul className="grid gap-2">
-          {scoredFights.map((fight) => {
-            const result = results[fight.id];
-            const winner = result.winner === "red" ? fight.red : fight.blue;
-            const loser = result.winner === "red" ? fight.blue : fight.red;
-            return (
-              <li
-                key={fight.id}
-                className="flex items-center gap-3 rounded-xl border border-line bg-surface px-3.5 py-3"
-              >
-                <span className="label w-16 flex-none text-[8px] text-muted/50">
-                  {fight.card === "prelims" ? "PRELIMS " : ""}
-                  {fight.order}
-                </span>
-                <span className="min-w-0 flex-1 truncate text-[14px]">
-                  <span className="last-name text-acid">{splitFighterName(winner.name).lastName}</span>
-                  <span className="label mx-2 text-[8px] text-muted/50">nug.</span>
-                  <span className="text-muted/60">{splitFighterName(loser.name).lastName}</span>
-                </span>
-                <span className="label flex-none text-[9px] text-muted">
-                  {result.method === "ko" ? `${result.label} ${result.round} r.` : result.label}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
+      {scoredFights.length > 0 && (
+        <section className="mt-12">
+          <header className="mb-3">
+            <p className="label text-[10px] text-acid">Oficialu</p>
+            <h2 className="text-[24px] leading-none font-semibold uppercase sm:text-[28px]">
+              Kovų rezultatai
+            </h2>
+          </header>
+          <ul className="grid gap-2">
+            {scoredFights.map((fight) => {
+              const result = results[fight.id];
+              const winner = result.winner === "red" ? fight.red : fight.blue;
+              const loser = result.winner === "red" ? fight.blue : fight.red;
+              return (
+                <li
+                  key={fight.id}
+                  className="flex items-center gap-3 rounded-xl border border-line bg-surface px-3.5 py-3"
+                >
+                  <span className="label w-16 flex-none text-[8px] text-muted/50">
+                    {fight.card === "prelims" ? "PRELIMS " : ""}
+                    {fight.order}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-[14px]">
+                    <span className="last-name text-acid">{splitFighterName(winner.name).lastName}</span>
+                    <span className="label mx-2 text-[8px] text-muted/50">nug.</span>
+                    <span className="text-muted/60">{splitFighterName(loser.name).lastName}</span>
+                  </span>
+                  <span className="label flex-none text-[9px] text-muted">
+                    {result.method === "ko" ? `${result.label} ${result.round} r.` : result.label}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       <footer className="mt-14 border-t border-line pt-6">
         <p className="text-[11px] leading-relaxed font-light text-muted/70">

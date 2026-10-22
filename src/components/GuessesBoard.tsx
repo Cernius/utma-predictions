@@ -14,7 +14,7 @@ export function GuessesBoard() {
   const { voter, ready, signIn } = useVoter();
   const [ballots, setBallots] = useState<Ballot[]>([]);
 
-  useEffect(() => subscribeToBallots(setBallots), []);
+  useEffect(() => subscribeToBallots(event.id, setBallots), []);
 
   const rows = useMemo(
     () => (voter ? sortGuessBallots(ballots, voter.id) : []),

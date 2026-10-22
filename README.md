@@ -1,11 +1,14 @@
-# UTMA #19 — spėjimų žaidimas
+# UTMA #20 — spėjimų žaidimas
 
 **Live: https://cernius.github.io/utma-predictions/**
 
-Unofficial fan prediction game for the [UTMA #19](https://stats.uniquetma.com/fightcard/20/main-card)
-main card and [prelims](https://stats.uniquetma.com/fightcard/20/prelims). Visitors enter a name, then for every fight pick the winner, the victory type
+Unofficial fan prediction game for the [UTMA #20](https://stats.uniquetma.com/fightcard/21/main-card)
+main card and [prelims](https://stats.uniquetma.com/fightcard/21/prelims). Visitors enter a name, then for every fight pick the winner, the victory type
 (knockout or points) and — for a knockout — the round. Everyone's picks stream in live and the
 crowd split is revealed per fight once your own prediction is complete.
+
+UTMA also runs an early prelims card; it is deliberately left out of the game. Past events keep
+their final standings at `/archyvas/<eventId>` — see [Archived events](#archived-events).
 
 Static Next.js export hosted on GitHub Pages, with predictions in Firebase Realtime Database.
 
@@ -40,7 +43,7 @@ enable Anonymous Authentication and tighten the write rule to `auth.uid === $vot
 Stored shape:
 
 ```
-predictions/utma-19/<voterId>
+predictions/utma-20/<voterId>
   name: "TITAS"
   updatedAt: 1758520000000
   picks/<fightId>
@@ -84,18 +87,40 @@ fight is worth up to three points, and each point only counts once the one befor
 | …and the right knockout round | +1 |
 
 A decision therefore tops out at two points — there is no round to call — so the perfect score
-is the sum of the per-fight maxima rather than `3 × fights`. For UTMA #19 (nine stoppages, three
-decisions) that is **33**, which is what the page shows as the denominator. An unfinished pick —
-no method chosen, or a knockout without a round — still names a fighter, so it keeps the winner
-point and forfeits the rest. That includes ballots cast before victory types existed, which
-stored the corner on its own.
+is the sum of the per-fight maxima rather than `3 × fights`, and it only settles once every
+outcome is in. An unfinished pick — no method chosen, or a knockout without a round — still names
+a fighter, so it keeps the winner point and forfeits the rest. That includes ballots cast before
+victory types existed, which stored the corner on its own.
 
 Ties break on winners called first (a card that read more fights right beats one carried by a
 single exact knockout), then on whoever filed their ballot earliest.
 
 Outcomes live in `src/data/results.ts`, keyed by the fight ids in `src/data/event.ts` and
-transcribed from the UTMA stats cards. A fight with no entry there is simply left out of the
-scoring, so the page works part-way through an event too.
+transcribed from the UTMA stats cards. It starts out empty for a card that has not been fought:
+a fight with no entry is simply left out of the scoring, so the page fills in through the night,
+and until the first result lands it says so instead of ranking everyone on nothing.
+
+## Archived events
+
+Past events keep their own copy of the card and the outcomes under `src/data/archive/` and get a
+read-only page at `/archyvas/<eventId>` — the same standings board, with no name gate, scoring the
+ballots still sitting under `predictions/<eventId>`. UTMA #19 is at
+[`/archyvas/utma-19`](https://cernius.github.io/utma-predictions/archyvas/utma-19/) (nine
+stoppages and three decisions, so a perfect card was worth **33**), linked from the front page and
+from `/rezultatai`.
+
+To archive the event that just finished, before swapping in the next card:
+
+1. Copy `src/data/event.ts` and `src/data/results.ts` into `src/data/archive/<eventId>.ts`,
+   renaming the exports to `archivedEvent` / `archivedCardSections` / `archivedFights` /
+   `archivedResults` and typing the metadata as `EventMeta`.
+2. Add `src/app/archyvas/<eventId>/page.tsx`, passing those to `<ResultsBoard … archived />`.
+3. Point the two "UTMA #NN" links — in `src/app/page.tsx` and `src/components/ResultsBoard.tsx`
+   — at the new route.
+
+Ballots are never copied or snapshotted: they live under `predictions/<eventId>` in Firebase and
+the archive reads them where they are. Leave the fighter portraits an archived card references in
+`public/fighters/` even when the live card no longer uses them.
 
 ## Admin page
 
@@ -126,6 +151,16 @@ your own ballot; other players are unaffected.
 
 `src/data/event.ts` holds the event metadata and the fights, in display order (prelims, then
 the main card; last fight of each card first). Fighter portraits live in
-`public/fighters/<slug>.png`; set `photo: null` when UTMA has no portrait and the silhouette
-placeholder is used instead. The number of selectable knockout rounds comes from each fight's
-`rounds` value.
+`public/fighters/<slug>.png`, copied straight from
+`https://stats.uniquetma.com/images/fighters/<slug>-mid.png`; set `photo: null` when that 404s and
+the silhouette placeholder is used instead. The number of selectable knockout rounds comes from
+each fight's `rounds` value.
+
+Moving to a new event also means emptying `src/data/results.ts`, swapping the event wordmark
+behind the name gate (`public/brand/utma-NN.svg`, from
+`https://stats.uniquetma.com/images/events/NN.svg`), updating the `UTMA #NN` page titles, and
+fixing the expected fight ids in `src/lib/guesses.test.ts`. Changing `event.id` starts the ballots
+and the saved names fresh: players enter their name again, and the previous event's data stays
+untouched under its own key, which is what the archive reads.
+
+Note that UTMA's own fight card URLs are offset by one — `/fightcard/21/` is UTMA #20.

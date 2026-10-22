@@ -5,7 +5,8 @@ import { event } from "@/data/event";
 
 export type Voter = { id: string; name: string };
 
-const KEY = `utma:voter:${event.id}`;
+const keyFor = (eventId: string) => `utma:voter:${eventId}`;
+const KEY = keyFor(event.id);
 /** Fired on same-tab writes; `storage` only covers other tabs. */
 const CHANGED = "utma:voter-changed";
 
@@ -65,6 +66,22 @@ function write(voter: Voter | null) {
 function createId() {
   if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
   return `v-${Math.random().toString(36).slice(2)}${Date.now().toString(36)}`;
+}
+
+/** A past event's key is never written to, so there is nothing to subscribe to. */
+const noSubscribe = () => () => {};
+
+/**
+ * The id this device voted under at a past event, so the archive can still mark your
+ * own row. Each event keeps its own key, so nothing carries over from one to the next;
+ * the server renders no highlight and the client fills it in on hydration.
+ */
+export function usePastVoterId(eventId: string | null): string | null {
+  const read = useCallback(
+    () => (eventId ? (parse(window.localStorage.getItem(keyFor(eventId)))?.id ?? null) : null),
+    [eventId],
+  );
+  return useSyncExternalStore(noSubscribe, read, () => null);
 }
 
 export function useVoter() {

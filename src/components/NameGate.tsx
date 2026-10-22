@@ -23,7 +23,7 @@ export function NameGate({
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-[0.05]"
         style={{
-          backgroundImage: `url(${asset("/brand/utma-19.svg")})`,
+          backgroundImage: `url(${asset("/brand/utma-20.svg")})`,
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           backgroundSize: "min(760px, 130%)",

@@ -31,7 +31,7 @@ export default function Home() {
   const [pendingFight, setPendingFight] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => subscribeToBallots(setBallots), []);
+  useEffect(() => subscribeToBallots(event.id, setBallots), []);
 
   const mine = useMemo(
     () => (voter ? ballots.find((b) => b.voterId === voter.id) : undefined),
@@ -196,6 +196,12 @@ export default function Home() {
           >
             Oficiali korta
           </a>
+          <Link
+            href="/archyvas/utma-19"
+            className="label rounded-lg border border-line bg-surface px-4 py-2.5 text-[10px] text-muted transition hover:border-acid/50 hover:text-acid"
+          >
+            UTMA #19 archyvas
+          </Link>
         </div>
       </header>
 
