@@ -97,8 +97,9 @@ single exact knockout), then on whoever filed their ballot earliest.
 
 Outcomes live in `src/data/results.ts`, keyed by the fight ids in `src/data/event.ts` and
 transcribed from the UTMA stats cards. It starts out empty for a card that has not been fought:
-a fight with no entry is simply left out of the scoring, so the page fills in through the night,
-and until the first result lands it says so instead of ranking everyone on nothing.
+a fight with no entry is simply left out of the scoring, so the page fills in through the night.
+Until the first result lands the front page leaves the "Rezultatai" button off altogether, and the
+page itself says the table is still to come rather than ranking everyone on nothing.
 
 ## Archived events
 

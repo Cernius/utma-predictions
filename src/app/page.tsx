@@ -6,6 +6,7 @@ import { FightRow } from "@/components/FightRow";
 import { Leaderboard } from "@/components/Leaderboard";
 import { NameGate } from "@/components/NameGate";
 import { cardSections, event, fights } from "@/data/event";
+import { results } from "@/data/results";
 import type { Ballot, Pick } from "@/lib/ballots";
 import {
   clearLocalBallots,
@@ -19,6 +20,9 @@ import { isFirebaseConfigured } from "@/lib/firebase";
 import { useHashFlag } from "@/lib/hash";
 import { asset } from "@/lib/paths";
 import { useVoter } from "@/lib/voter";
+
+/** No point sending anyone to an empty scoreboard before the first fight is called. */
+const hasResults = Object.keys(results).length > 0;
 
 export default function Home() {
   const { voter, ready, signIn, signOut } = useVoter();
@@ -168,20 +172,14 @@ export default function Home() {
         </dl>
 
         <div className="mt-6 flex flex-wrap gap-2">
-          <a
-            href={event.ticketsUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="label rounded-lg bg-acid px-4 py-2.5 text-[10px] text-ink transition hover:brightness-110"
-          >
-            Bilietai
-          </a>
-          <Link
-            href="/rezultatai"
-            className="label rounded-lg border border-acid/50 bg-surface px-4 py-2.5 text-[10px] text-acid transition hover:bg-acid/10"
-          >
-            Rezultatai
-          </Link>
+          {hasResults && (
+            <Link
+              href="/rezultatai"
+              className="label rounded-lg border border-acid/50 bg-surface px-4 py-2.5 text-[10px] text-acid transition hover:bg-acid/10"
+            >
+              Rezultatai
+            </Link>
+          )}
           <Link
             href="/spejimai"
             className="label rounded-lg border border-line bg-surface px-4 py-2.5 text-[10px] text-muted transition hover:border-acid/50 hover:text-acid"
